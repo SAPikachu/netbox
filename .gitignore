@@ -1,0 +1,4 @@
+openvpn/config/*
+bind/*.key*
+bind/db.*
+

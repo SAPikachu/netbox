@@ -1,0 +1,27 @@
+#!/bin/bash
+
+if [ ! -d "/ro" ]; then
+    # aufs is disabled
+    exit 0
+fi
+
+if [ -f "/etc/sapikachu/discard-aufs" ]; then
+    exit 0
+fi
+
+echo "Excuting sync-aufs..."
+
+# do not overwrite fstab
+
+mkdir /tmp/sync-aufs
+cp /ro/etc/fstab /tmp/sync-aufs/
+
+sync
+remountrw
+aubrsync copy / /rw /ro
+cp -f /tmp/sync-aufs/fstab /ro/etc/
+rm -rf /ro/tmp/sync-aufs
+remountro
+sync
+
+rm -rf /tmp/sync-aufs

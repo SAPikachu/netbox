@@ -1,0 +1,186 @@
+options {
+    directory "/var/cache/bind";
+
+    // If there is a firewall between you and nameservers you want
+    // to talk to, you may need to fix the firewall to allow multiple
+    // ports to talk.  See http://www.kb.cert.org/vuls/id/800113
+
+    // If your ISP provided one or more IP addresses for stable 
+    // nameservers, you probably want to use them as forwarders.  
+    // Uncomment the following block, and insert the addresses replacing 
+    // the all-0's placeholder.
+
+    forwarders {
+        8.8.8.8;
+        8.8.4.4;
+    };
+
+    forward only;
+
+    allow-query {
+        192.168.0.0/16;
+        127.0.0.0/24;
+    };
+
+
+    auth-nxdomain no;    # conform to RFC1035
+    listen-on-v6 { any; };
+};
+
+logging{
+  channel simple_log {
+    file "/var/log/named/bind.log" versions 3 size 1m;
+    severity debug;
+    print-time yes;
+    print-severity yes;
+    print-category yes;
+  };
+  category default{
+    simple_log;
+  };
+};
+
+zone "sandai.net" {
+    include "/etc/bind/gz-telecom-dns-forwarder.inc";
+};
+zone "xunlei.com" {
+    include "/etc/bind/gz-telecom-dns-forwarder.inc";
+};
+zone "ecitic.com" {
+    include "/etc/bind/gz-telecom-dns-forwarder.inc";
+};
+zone "taobao.com" {
+    include "/etc/bind/gz-telecom-dns-forwarder.inc";
+};
+zone "baidu.com" {
+    include "/etc/bind/gz-telecom-dns-forwarder.inc";
+};
+zone "178.com" {
+    include "/etc/bind/gz-telecom-dns-forwarder.inc";
+};
+zone "sohu.com" {
+    include "/etc/bind/gz-telecom-dns-forwarder.inc";
+};
+zone "shifen.com" {
+    include "/etc/bind/gz-telecom-dns-forwarder.inc";
+};
+zone "bdimg.com" {
+    include "/etc/bind/gz-telecom-dns-forwarder.inc";
+};
+zone "ctrip.com" {
+    include "/etc/bind/gz-telecom-dns-forwarder.inc";
+};
+zone "qidian.com" {
+    include "/etc/bind/gz-telecom-dns-forwarder.inc";
+};
+zone "cmfu.com" {
+    include "/etc/bind/gz-telecom-dns-forwarder.inc";
+};
+zone "sdo.com" {
+    include "/etc/bind/gz-telecom-dns-forwarder.inc";
+};
+zone "ccgslb.net" {
+    include "/etc/bind/gz-telecom-dns-forwarder.inc";
+};
+zone "fwdns.net" {
+    include "/etc/bind/gz-telecom-dns-forwarder.inc";
+};
+zone "cloudcdn.net" {
+    include "/etc/bind/gz-telecom-dns-forwarder.inc";
+};
+zone "taobaocdn.com" {
+    include "/etc/bind/gz-telecom-dns-forwarder.inc";
+};
+zone "tbcache.com" {
+    include "/etc/bind/gz-telecom-dns-forwarder.inc";
+};
+zone "tmall.com" {
+    include "/etc/bind/gz-telecom-dns-forwarder.inc";
+};
+zone "akamai.net" {
+    include "/etc/bind/gz-telecom-dns-forwarder.inc";
+};
+zone "akamaitech.net" {
+    include "/etc/bind/gz-telecom-dns-forwarder.inc";
+};
+zone "chinacache.net" {
+    include "/etc/bind/gz-telecom-dns-forwarder.inc";
+};
+zone "163.com" {
+    include "/etc/bind/gz-telecom-dns-forwarder.inc";
+};
+zone "netease.com" {
+    include "/etc/bind/gz-telecom-dns-forwarder.inc";
+};
+
+zone "alisoft.com" {
+    include "/etc/bind/gz-telecom-dns-forwarder.inc";
+};
+
+zone "alicdn.com" {
+    include "/etc/bind/gz-telecom-dns-forwarder.inc";
+};
+zone "aliyun.com" {
+    include "/etc/bind/gz-telecom-dns-forwarder.inc";
+};
+zone "alipaydns.com" {
+    include "/etc/bind/gz-telecom-dns-forwarder.inc";
+};
+zone "tanx.com" {
+    include "/etc/bind/gz-telecom-dns-forwarder.inc";
+};
+
+zone "iask.com" {
+    include "/etc/bind/gz-telecom-dns-forwarder.inc";
+};
+zone "sinaedge.com" {
+    include "/etc/bind/gz-telecom-dns-forwarder.inc";
+};
+zone "atpanel.com" {
+    include "/etc/bind/gz-telecom-dns-forwarder.inc";
+};
+zone "alipay.com" {
+    include "/etc/bind/gz-telecom-dns-forwarder.inc";
+};
+
+zone "shanbay.com" {
+    include "/etc/bind/gz-telecom-dns-forwarder.inc";
+};
+
+zone "dnspod.net" {
+    include "/etc/bind/gz-telecom-dns-forwarder.inc";
+};
+zone "qq.com" {
+    include "/etc/bind/gz-telecom-dns-forwarder.inc";
+};
+zone "qqmail.com" {
+    include "/etc/bind/gz-telecom-dns-forwarder.inc";
+};
+zone "chinapay.com" {
+    include "/etc/bind/gz-telecom-dns-forwarder.inc";
+};
+zone "windowsupdate.com" {
+    include "/etc/bind/gz-telecom-dns-forwarder.inc";
+};
+zone "com.cn" {
+    include "/etc/bind/gz-telecom-dns-forwarder.inc";
+};
+
+zone "net.cn" {
+    include "/etc/bind/gz-telecom-dns-forwarder.inc";
+};
+
+zone "org.cn" {
+    include "/etc/bind/gz-telecom-dns-forwarder.inc";
+};
+
+zone "gov.cn" {
+    include "/etc/bind/gz-telecom-dns-forwarder.inc";
+};
+
+zone "*.cn" {
+    include "/etc/bind/gz-telecom-dns-forwarder.inc";
+};
+zone "cn" {
+    include "/etc/bind/gz-telecom-dns-forwarder.inc";
+};
