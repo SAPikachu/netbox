@@ -47,6 +47,7 @@ iptables -A INPUT -i eth0 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 iptables -A INPUT -i tun0 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 iptables -A INPUT -p tcp --dport ssh -j ACCEPT
 iptables -A INPUT -p tcp -s 192.168.1.0/24 --dport 3128 -j ACCEPT
+iptables -A INPUT -p tcp -s 192.168.1.0/24 --dport 443 -j ACCEPT
 iptables -A INPUT -p udp -s 192.168.1.0/24 --dport 53 -j ACCEPT
 #iptables -A INPUT -s 192.168.1.0/24 -d $LOCAL_IP -j ACCEPT
 
