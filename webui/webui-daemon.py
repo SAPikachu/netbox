@@ -23,6 +23,8 @@ class WebUIDaemon(object):
 
     def run(self):
         sys.path.append(PREFIX)
+        # Flask's reloader forks using sys.argv, set it to the actual entry-point since we can't run the daemon script again
+        sys.argv = [os.path.join(PREFIX, "webui.py")]
         from webui import app
         app.run(debug=True)
 
