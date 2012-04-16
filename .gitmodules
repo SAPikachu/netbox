@@ -1,0 +1,3 @@
+[submodule "webui/static/bootstrap"]
+	path = webui/static/bootstrap
+	url = git://github.com/twitter/bootstrap.git
