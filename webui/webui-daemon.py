@@ -14,8 +14,8 @@ PREFIX = os.path.abspath(os.path.dirname(__file__))
 class WebUIDaemon(object):
     def __init__(self):
         self.stdin_path = os.devnull
-        self.stdout_path = os.devnull
-        # self.stdout_path = os.path.join(PREFIX, "test.log")
+        # self.stdout_path = os.devnull
+        self.stdout_path = os.path.join(PREFIX, "/var/log/webui.log")
         self.stderr_path = self.stdout_path
 
         self.pidfile_path = "/var/run/webui.pid"
