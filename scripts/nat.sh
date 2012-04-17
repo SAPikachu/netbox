@@ -20,6 +20,10 @@ fi
 
 echo "1" > /proc/sys/net/ipv4/ip_forward
 
+echo 60 > /proc/sys/net/ipv4/tcp_keepalive_time
+echo 30 > /proc/sys/net/ipv4/tcp_keepalive_intvl
+echo 5 > /proc/sys/net/ipv4/tcp_keepalive_probes
+
 $PREFIX/reset-iptables.sh
 
 # nat
