@@ -6,6 +6,8 @@ local_net=$(echo $route_net_gateway | cut -d. -f 1-3).0
 local_route_params=$(ip route get $route_net_gateway | head -1 | grep -Eo " .*")
 local_route_params="$local_route_params proto kernel scope link"
 
+echo "$local_net / $local_route_params"
+
 set -eu
 
 table="table openvpn"
