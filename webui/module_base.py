@@ -10,7 +10,7 @@ class Module(object):
 
 def _wrap_method(app, method):
     def wrapped():
-        params = dict(request.form)
+        params = dict(request.form.items())
         resp_content = json.dumps(method(**params))
         resp = app.make_response(unicode(resp_content))
         resp.mimetype = "application/json"
@@ -18,10 +18,13 @@ def _wrap_method(app, method):
 
     return wrapped
 
-def register_imported_modules(app):
+def register_imported_modules(app, base_path):
+    config = {
+        "base_path": base_path,
+    }
     for module_class in Module.__subclasses__():
         module_name = module_class.__name__.lower()
-        instance = module_class()
+        instance = module_class(config)
         for member_name in dir(instance):
             member = getattr(instance, member_name)
             if member_name.startswith("_") or not callable(member):
