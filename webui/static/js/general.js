@@ -1,17 +1,70 @@
-function server_invoke(module_name, function_name, data, on_success, on_error) {
-    on_success = on_success || function() {};
-    on_error = on_error || function() {};
-    $.post(
-        "/modules/" + module_name + "/" + function_name,
-        data,
-        on_success,
-        "json"
-    ).error(on_error);
+function nop() {}
+
+function show_modal(header_text, body, actions, show_close_button) {
+    var modal = $("#modal");
+    modal.find(".modal-header h3").text(header_text);
+    var body_elem = modal.find(".modal-body");
+    if (typeof body === "string") {
+        body_elem.html(body);
+    } else {
+        body_elem.children().remove();
+        body_elem.append(body);
+    }
+    var footer = modal.find(".modal-footer");
+    footer.children().remove();
+    $.each(actions || {}, function(i, action) {
+        $("<a/>").
+            attr("href", "#").
+            addClass("btn").
+            text(action.text).
+            click(action.callback).
+            appendTo(footer);
+    });
+    modal.find(".close").toggle(!!show_close_button);
+    modal.modal({
+        backdrop: "static",
+        keyboard: false
+    });
+}
+
+function hide_modal() {
+    $("#modal").modal("hide");
+}
+
+function server_invoke(module_name, function_name, data, on_success, on_error, silent) {
+    on_success = on_success || nop;
+    on_error = on_error || nop;
+
+    var _show_modal = silent ? nop : show_modal;
+    var _hide_modal = silent ? nop : hide_modal;
+
+    _show_modal(
+        "Calling " + module_name + "." + function_name,
+        '<div class="progress progress-striped active"><div class="bar" style="width: 100%;"></div></div>'
+    );
+
+    return $.ajax({
+        type: "POST",
+        url: "/modules/" + module_name + "/" + function_name,
+        data: data,
+        dataType: "json",
+        success: function() {
+            _hide_modal();
+            on_success.apply(this, arguments);
+        },
+        error: function(xhr, status, message) {
+            _show_modal(
+                "Failed to call " + module_name + "." + function_name,
+                $("<div/>").text(status + ": " + message)
+            );
+            on_error.apply(this, arguments);
+        }
+    });
 };
 
 $(function() {
-    server_invoke("openvpn", "get_configuration", function(data) {
-        server_list_control = $("#openvpn-select-server");
+    server_invoke("openvpn", "get_configuration", {}, function(data) {
+        var server_list_control = $("#openvpn-select-server");
         $.each(data.servers, function(i, value) {
             $("<option/>").
                 text(value).
@@ -27,5 +80,103 @@ $(function() {
                 {server_name: server_list_control.val()}
             );
         });
+        var state_control = $("#openvpn-state");
+        var status_snapshot = {};
+        function calculate_status(raw_data) {
+            status = {
+                time: new Date(),
+                download_actual: parseInt(raw_data["TUN/TAP write bytes"]),
+                download_all: parseInt(raw_data["TCP/UDP read bytes"]),
+                upload_actual: parseInt(raw_data["TUN/TAP read bytes"]),
+                upload_all: parseInt(raw_data["TCP/UDP write bytes"]),
+            };
+            time_delta = (status.time - status_snapshot.time) / 1000.0;
+            status.download_speed_actual = 
+                (status.download_actual - 
+                 status_snapshot.download_actual) /
+                time_delta;
+            status.download_speed_all = 
+                (status.download_all - 
+                 status_snapshot.download_all) /
+                time_delta;
+            status.upload_speed_actual = 
+                (status.upload_actual - 
+                 status_snapshot.upload_actual) /
+                time_delta;
+            status.upload_speed_all = 
+                (status.upload_all - 
+                 status_snapshot.upload_all) /
+                time_delta;
+                
+            status_snapshot = status;
+            return status;
+        }
+        function add_field(name, value) {
+            $("<dt/>").text(name).appendTo(state_control);
+            $("<dd/>").text(value).appendTo(state_control);
+        }
+        function is_all_number(vars) {
+            var ret = true;
+            $.each(vars, function(i, value) {
+                if ((typeof value != "number") || !isFinite(value)) {
+                    ret = false;
+                }
+            });
+            return ret;
+        }
+        function number_to_display(num) {
+            suffixes = [" B", " KB", " MB", "GB", " TB"];
+            suffix_index = 0;
+            while (num > 1024 && suffix_index < suffixes.length - 1) {
+                num /= 1024;
+                suffix_index++;
+            }
+            num = Math.round(num * 100) / 100;
+            return num + suffixes[suffix_index];
+        }
+        function add_status_field(status, display_prefix) {
+            prefix = display_prefix.toLowerCase();
+            amount_all = status[prefix + "_all"];
+            amount_actual = status[prefix + "_actual"];
+            speed_all = status[prefix + "_speed_all"];
+            speed_actual = status[prefix + "_speed_actual"];
+            if (!is_all_number(
+                [amount_all, amount_actual, speed_all, speed_actual]
+            )) {
+                return;
+            }
+            add_field(
+                display_prefix + "ed", 
+                number_to_display(amount_all) + " (" + 
+                    number_to_display(amount_actual) + " actual data)"
+            );
+            add_field(
+                display_prefix + " speed", 
+                number_to_display(speed_all) + "/s (" + 
+                    number_to_display(speed_actual) + "/s actual)"
+            );
+        }
+        function set_state_display(state_data) {
+            state_control.children().remove();
+            add_field("State", state_data.state);
+            if (state_data["status_data"]) {
+                status = calculate_status(state_data.status_data);
+                add_status_field(status, "Download");
+                add_status_field(status, "Upload");
+            }
+        };
+        function refresh_state() {
+            server_invoke(
+                "openvpn", "get_status", null, 
+                function (data) {
+                    set_state_display(data);
+                }, 
+                function () {
+                    set_state_display({state: "ERROR"});
+                }, 
+                true
+            ).complete(function() { setTimeout(refresh_state, 5000) });
+        };
+        refresh_state()
     });  
 });

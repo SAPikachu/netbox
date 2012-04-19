@@ -49,16 +49,33 @@
     </div>
 
     <div class="container">
-
+        <div class="modal" id="modal">
+            <div class="modal-header">
+                <a class="close" data-dismiss="modal">×</a>
+                <h3></h3>
+            </div>
+            <div class="modal-body">
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
         <form class="form-horizontal">
             <fieldset>
                 <legend>OpenVPN</legend>
-                <div class="control-group">
-                    <label for="openvpn-select-server" class="control-label">
-                        Select server
-                    </label>
-                    <div class="controls">
-                        <select id="openvpn-select-server"></select>
+                <div class="row">
+                    <div class="span8">
+                        <div class="control-group">
+                            <label for="openvpn-select-server" class="control-label">
+                                Select server
+                            </label>
+                            <div class="controls">
+                                <select id="openvpn-select-server"></select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="span4">
+                        <dl id="openvpn-state" class="dl-horizontal">
+                        </dl>
                     </div>
                 </div>
                 <div class="form-actions">
