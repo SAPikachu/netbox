@@ -29,5 +29,7 @@ while (($#)); do
     shift
 done
 
+$dry_run sync
+$dry_run sync
 $dry_run remountro
 $dry_run sync
