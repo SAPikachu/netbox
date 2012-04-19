@@ -3,6 +3,7 @@ from __future__ import division, print_function, unicode_literals
 import os
 import glob
 import subprocess
+import socket
 
 from module_base import Module
 
@@ -35,5 +36,34 @@ class OpenVPN(Module):
         with open(self.config_name_path, "w") as f:
             f.write(server_name + ".ovpn")
 
-        subprocess.check_call(["service", "openvpn-init.d", "restart"])
+        subprocess.check_call(
+            ["service", "openvpn-init.d", "restart"],
+            close_fds=True,
+        )
+    
+    def get_status(self):
+        try:
+            s = socket.create_connection(("127.0.0.1", 56876), 1)
+            f = s.makefile("w")
+            f.readline()
+            f.write("state\n")
+            f.flush()
+            content = f.readline()
+            state = content.split(",")[1]
+            f.readline()
+            f.write("status\n")
+            f.flush()
+            f.readline()
+            status_data = {}
+            for line in f:
+                line = line.strip()
+                if line == "END":
+                    break
 
+                status_data.update([line.split(",", 2)])
+
+            f.close()
+            s.close()
+            return {"state": state, "status_data": status_data}
+        except socket.timeout:
+            return {"state": "UNKNOWN"}
