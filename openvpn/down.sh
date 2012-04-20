@@ -14,7 +14,6 @@ table="table openvpn"
 
 ip route flush $table
 ip route add $local_net/24 $local_route_params $table
-ip route add default via $route_net_gateway $table
 
 ip route flush cache
 
