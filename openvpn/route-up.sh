@@ -26,4 +26,5 @@ ip route add default via $route_vpn_gateway $table
 /etc/sapikachu/openvpn/chnroutes.sh "via $route_net_gateway $table"
 
 ip route flush cache
+service unbound restart
 
