@@ -8,7 +8,7 @@ if [ "$1" == "--dry-run" ]; then
 fi
 
 $dry_run remountrw
-
+$dry_run auplink flush
 tmp_dir=/tmp/sync-file-tmp
 
 
@@ -30,6 +30,7 @@ while (($#)); do
 done
 
 $dry_run sync
+$dry_run auplink flush
 $dry_run sync
 $dry_run remountro
 $dry_run sync
