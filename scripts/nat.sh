@@ -30,9 +30,12 @@ $PREFIX/reset-iptables.sh
 iptables -A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS  --clamp-mss-to-pmtu
 iptables -t nat -A POSTROUTING -o eth0 -s 192.168.1.0/24 -j MASQUERADE
 iptables -t nat -A POSTROUTING -o tun0 -j MASQUERADE
+iptables -t nat -A POSTROUTING -o ppp0 -j MASQUERADE
 
 iptables -A FORWARD -i eth0 -o tun0 -j ACCEPT
+iptables -A FORWARD -i eth0 -o ppp0 -j ACCEPT
 iptables -A FORWARD -i tun0 -o eth0 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+iptables -A FORWARD -i ppp0 -o eth0 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 
 iptables -A FORWARD -i eth0 -o eth0 -s 192.168.1.0/24 -j ACCEPT
 iptables -A FORWARD -i eth0 -o eth0 -d 192.168.1.0/24 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
@@ -49,6 +52,7 @@ iptables -A OUTPUT -o lo -p all -j ACCEPT
 #
 iptables -A INPUT -i eth0 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 iptables -A INPUT -i tun0 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+iptables -A INPUT -i ppp0 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 iptables -A INPUT -p tcp --dport ssh -j ACCEPT
 iptables -A INPUT -p tcp -s 192.168.1.0/24 --dport 3128 -j ACCEPT
 iptables -A INPUT -p tcp -s 192.168.1.0/24 --dport 443 -j ACCEPT
