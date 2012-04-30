@@ -13,15 +13,22 @@ echo "Excuting sync-aufs..."
 
 # do not overwrite fstab
 
-mkdir /tmp/sync-aufs
-cp /ro/etc/fstab /tmp/sync-aufs/
+mkdir /run/sync-aufs
+cp /ro/etc/fstab /run/sync-aufs/
 
 sync
-remountrw
-aubrsync copy / /rw /ro
-cp -f /tmp/sync-aufs/fstab /ro/etc/
-rm -rf /ro/tmp/sync-aufs
+remountrw > /run/sync-aufs.log 2>&1
+# lsof >> /run/sync-aufs.log
+# fuser -v -m / >> /run/sync-aufs.log 2>&1
+# echo "Forcibly remounting as read-only" >> /run/sync-aufs.log 2>&1
+# mount -f -v -v -o remount,ro / >> /run/sync-aufs.log 2>&1 
+aubrsync --dry_run copy / /rw /ro >> /run/sync-aufs.log 2>&1
+aubrsync copy / /rw /ro >> /run/sync-aufs.log 2>&1
+# mount -v -v -o remount,rw / >> /run/sync-aufs.log 2>&1 
+cp /run/sync-aufs.log /ro/var/log/
+cp -f /run/sync-aufs/fstab /ro/etc/
+rm -rf /ro/run/sync-aufs > /dev/null 2>&1
 remountro
 sync
 
-rm -rf /tmp/sync-aufs
+rm -rf /run/sync-aufs
