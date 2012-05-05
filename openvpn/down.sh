@@ -2,13 +2,15 @@
 
 echo down
 
-local_net=$(echo $route_net_gateway | cut -d. -f 1-3).0
-local_route_params=$(ip route get $route_net_gateway | head -1 | grep -Eo " .*")
-local_route_params="$local_route_params proto kernel scope link"
+interface="eth0"
+if_ip=`ip addr show primary $interface | sed -n 's/ *inet \(.*\)\/.*/\1/p'`
+
+local_net=$(echo $if_ip | cut -d. -f 1-3).0
+local_route_params="dev $interface proto kernel scope link src $if_ip"
 
 echo "$local_net / $local_route_params"
 
-set -eu
+set -u
 
 table="table openvpn"
 
@@ -17,3 +19,4 @@ ip route add $local_net/24 $local_route_params $table
 
 ip route flush cache
 
+exit 0
