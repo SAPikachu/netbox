@@ -25,8 +25,6 @@ ip route add $remote_1/32 $gateway_route $table
 ip route add default via $route_vpn_gateway $table
 
 ip route flush cache
-service unbound restart
-# ddclient
 
 initctl emit --no-wait openvpn-route-up GATEWAY_ROUTE="$gateway_route" TABLE="$table"
 
