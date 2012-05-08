@@ -46,7 +46,7 @@ def build_route_script():
     print("#!/bin/bash")
     print("")
     for ip, _, mask in ips:
-        print("ip route add {ip}/{mask} $1".format(ip=ip, mask=mask))
+        print("ip route add {ip}/{mask} $*".format(ip=ip, mask=mask))
 
 if __name__ == "__main__":
     build_route_script()
