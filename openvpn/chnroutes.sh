@@ -576,6 +576,11 @@ ip route add 103.8.4.0/22 $1
 ip route add 103.8.8.0/22 $1
 ip route add 103.8.32.0/22 $1
 ip route add 103.8.52.0/22 $1
+ip route add 103.8.108.0/22 $1
+ip route add 103.8.156.0/22 $1
+ip route add 103.8.200.0/22 $1
+ip route add 103.8.204.0/22 $1
+ip route add 103.8.220.0/22 $1
 ip route add 103.10.0.0/22 $1
 ip route add 103.10.16.0/22 $1
 ip route add 103.10.84.0/22 $1
