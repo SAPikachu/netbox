@@ -29,6 +29,6 @@ ip route flush cache
 service unbound restart
 # ddclient
 
-initctl emit openvpn-d-connected
+initctl emit --no-wait openvpn-route-up
 
 exit 0
