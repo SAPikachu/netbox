@@ -13,7 +13,7 @@ tmp_dir=/run/sync-file-tmp
 
 
 while (($#)); do
-    full_path="$1"
+    full_path=`python -c "import os; print os.path.abspath('$1')"`
     dir=$(readlink -m $(dirname "$full_path"))
     base=$(basename "$full_path")
 
