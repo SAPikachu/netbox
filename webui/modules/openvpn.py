@@ -37,7 +37,7 @@ class OpenVPN(Module):
             f.write(server_name + ".ovpn")
 
         subprocess.check_call(
-            ["service", "openvpn-init.d", "restart"],
+            ["initctl", "restart", "openvpn-d"],
             close_fds=True,
         )
     
