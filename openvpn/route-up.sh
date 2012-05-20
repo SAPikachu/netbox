@@ -21,6 +21,9 @@ export OPENVPN_ROUTE_TABLE="$table"
 # Copy all routes except default route to the table
 ip route show | grep -v ^default | awk '{ system("ip route add " $0 "$OPENVPN_ROUTE_TABLE") } '
 
+# Also add to the main table, since openvpn uses main table itself
+ip route add $remote_1/32 $gateway_route
+
 ip route add $remote_1/32 $gateway_route $table
 ip route add default via $route_vpn_gateway $table
 
