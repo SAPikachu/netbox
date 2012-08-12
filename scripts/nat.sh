@@ -11,7 +11,8 @@ ip rule list | grep "openvpn" > /dev/null
 if [ "$?" -ne "0" ]; then
     ip addr add $SERVICE_LOCAL_IP/24 brd + dev eth0
     ip rule add from $SERVICE_LOCAL_IP/32 table openvpn
-    ip rule add from 192.168.1.32/29 table openvpn
+    ip rule add from 192.168.1.32/28 table openvpn
+    ip rule add from 172.25.0.0/16 table openvpn
 
     ip route add 192.168.1.0/24 proto kernel scope link metric 1 table openvpn
 
@@ -29,13 +30,16 @@ $PREFIX/reset-iptables.sh
 # nat
 iptables -A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS  --clamp-mss-to-pmtu
 iptables -t nat -A POSTROUTING -o eth0 -s 192.168.1.0/24 -j MASQUERADE
+iptables -t nat -A POSTROUTING -s 172.25.0.0/16 -j MASQUERADE
 iptables -t nat -A POSTROUTING -o tun0 -j MASQUERADE
 iptables -t nat -A POSTROUTING -o ppp0 -j MASQUERADE
 
 iptables -A FORWARD -i eth0 -o tun0 -j ACCEPT
 iptables -A FORWARD -i eth0 -o ppp0 -j ACCEPT
+iptables -A FORWARD -i tun10 -j ACCEPT
 iptables -A FORWARD -i tun0 -o eth0 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 iptables -A FORWARD -i ppp0 -o eth0 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+iptables -A FORWARD -o tun10 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 
 iptables -A FORWARD -i eth0 -o eth0 -s 192.168.1.0/24 -j ACCEPT
 iptables -A FORWARD -i eth0 -o eth0 -d 192.168.1.0/24 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
@@ -57,7 +61,9 @@ iptables -A INPUT -p tcp --dport ssh -j ACCEPT
 iptables -A INPUT -p tcp -s 192.168.1.0/24 --dport 3128 -j ACCEPT
 iptables -A INPUT -p tcp -s 192.168.1.0/24 --dport 443 -j ACCEPT
 iptables -A INPUT -p udp -s 192.168.1.0/24 --dport 53 -j ACCEPT
+iptables -A INPUT -p udp -s 172.25.0.0/16 --dport 53 -j ACCEPT
 iptables -A INPUT -p udp -s 192.168.1.0/24 --dport 137 -j ACCEPT
+iptables -A INPUT -p udp --dport 6876 -j ACCEPT
 #iptables -A INPUT -s 192.168.1.0/24 -d $LOCAL_IP -j ACCEPT
 
 # cfosspeed status broadcast
