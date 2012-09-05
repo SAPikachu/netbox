@@ -2,8 +2,58 @@
 
 {% block nav_class_connections %}active{% endblock %}
 
+{% block head_extra %}
+<style type="text/css">
+.sort-header
+{
+    cursor: pointer;
+}
+.sort-up:after
+{
+    content: " \2193";
+}
+.sort-down:after
+{
+    content: " \2191";
+}
+</style>
+{% endblock %}
+
 {% block body %}
+<table id="connection-list" class="table table-condensed table-bordered">
+    <thead>
+        <tr class="header-cat">
+            <th colspan="2"></th>
+            <th colspan="6">Tx</th>
+            <th colspan="6">Rx</th>
+            <th colspan="1"></th>
+        </tr>
+        <tr class="header-main">
+            <th data-key="version">ver</th>
+            <th data-key="protocol">proto</th>
+
+            <th data-key="tx.src">src</th>
+            <th data-key="tx.sport">sport</th>
+            <th data-key="tx.dst">dst</th>
+            <th data-key="tx.dport">dport</th>
+            <th data-key="tx.packets">packets</th>
+            <th data-key="tx.bytes">bytes</th>
+
+            <th data-key="rx.src">src</th>
+            <th data-key="rx.sport">sport</th>
+            <th data-key="rx.dst">dst</th>
+            <th data-key="rx.dport">dport</th>
+            <th data-key="rx.packets">packets</th>
+            <th data-key="rx.bytes">bytes</th>
+
+            <th data-key="state">state</th>
+        </tr>
+        <tbody></tbody>
+    </thead>
+</table>
 {% endblock %}
 
 {% block scripts_extra %}
+<script src="static/js/tablesort.js"></script>
+<script src="static/js/connections.js"></script>
 {% endblock %}
