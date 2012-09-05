@@ -25,6 +25,8 @@ echo 60 > /proc/sys/net/ipv4/tcp_keepalive_time
 echo 30 > /proc/sys/net/ipv4/tcp_keepalive_intvl
 echo 5 > /proc/sys/net/ipv4/tcp_keepalive_probes
 
+sysctl -w net.netfilter.nf_conntrack_acct=1
+
 $PREFIX/reset-iptables.sh
 
 # nat
