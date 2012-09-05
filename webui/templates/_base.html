@@ -13,6 +13,9 @@
       body {
         padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
       }
+      #modal {
+        display: none;
+      }
     </style>
     <link href="static/bootstrap-assets/css/bootstrap-responsive.css" rel="stylesheet">
 
@@ -43,6 +46,7 @@
           <div class="nav-collapse">
             <ul class="nav">
                 <li class="{% block nav_class_index %}{% endblock %}"><a href="/">General</a></li>
+                <li class="{% block nav_class_connections %}{% endblock %}"><a href="/connections">Connections</a></li>
             </ul>
           </div><!--/.nav-collapse -->
         </div>
