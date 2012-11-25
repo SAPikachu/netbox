@@ -1,6 +1,7 @@
 $(function() {
     server_invoke("openvpn", "get_configuration", {}, function(data) {
         var server_list_control = $("#openvpn-select-server");
+        var port_control = $("#openvpn-port");
         $.each(data.servers, function(i, value) {
             $("<option/>").
                 text(value).
@@ -8,12 +9,18 @@ $(function() {
                 appendTo(server_list_control);
         });
         server_list_control.val(data.selected_server);
+        if (data.selected_port) {
+            port_control.val(data.selected_port);
+        }
         $("#openvpn-save").click(function(e) {
             e.preventDefault();
             server_invoke(
                 "openvpn", 
                 "select_server", 
-                {server_name: server_list_control.val()}
+                {
+                    server_name: server_list_control.val(),
+                    port: port_control.val()
+                }
             );
         });
         var state_control = $("#openvpn-state");

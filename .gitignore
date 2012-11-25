@@ -3,3 +3,5 @@ bind/*.key*
 bind/db.*
 
 *.pyc
+openvpn/config_name
+openvpn/extra_params
