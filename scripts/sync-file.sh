@@ -19,7 +19,10 @@ while (($#)); do
 
     # we need to copy to a temporary location first, otherwise the file may be truncated
     $dry_run mkdir $tmp_dir
-    $dry_run cp -arf "$1" "$tmp_dir/$base"
+
+    # Stop if copying fails
+    $dry_run cp -arf "$1" "$tmp_dir/$base" || (rm -rf $tmp_dir; exit 1;)
+
     # $dry_run mkdir -p "/rw$dir"
     # $dry_run cp -rf "$tmp_dir/$base" "/rw$dir"
     $dry_run mkdir -p "/ro$dir"
