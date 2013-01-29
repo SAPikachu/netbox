@@ -12,7 +12,7 @@ set -u
 
 table="table openvpn"
 
-gateway_route=`ip route get $remote_1 | head -1 | sed s/^$remote_1//`
+gateway_route=`/etc/sapikachu/vpnutils/gateway-route.sh $remote_1`
 
 ip route flush $table
 
