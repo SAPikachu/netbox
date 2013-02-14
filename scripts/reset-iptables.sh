@@ -53,3 +53,8 @@ $IPTABLES -t mangle -F
 $IPTABLES -X
 $IPTABLES -t nat -X
 $IPTABLES -t mangle -X
+
+#
+# destroy all ipset sets
+#
+ipset destroy

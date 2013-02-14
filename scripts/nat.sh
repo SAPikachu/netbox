@@ -28,6 +28,44 @@ echo 5 > /proc/sys/net/ipv4/tcp_keepalive_probes
 sysctl -w net.netfilter.nf_conntrack_acct=1
 
 $PREFIX/reset-iptables.sh
+$PREFIX/../vpnutils/ipset-chn-networks.sh
+
+iptables -t nat -N vpn-mark
+iptables -t nat -N vpn-action
+iptables -t filter -N vpn-reject
+
+# Only specified sources can go through VPN
+ipset create vpnclients hash:net
+ipset add vpnclients $SERVICE_LOCAL_IP
+ipset add vpnclients 192.168.1.32/28
+ipset add vpnclients 192.168.1.208/28
+ipset add vpnclients 172.25.0.0/16
+iptables -t nat -A vpn-mark -m set ! --match-set vpnclients src -j RETURN
+
+# Local packets shouldn't go through VPN
+iptables -t nat -A vpn-mark -i lo -j RETURN
+iptables -t nat -A vpn-mark -o lo -j RETURN
+iptables -t nat -A vpn-mark -d 10.0.0.0/8 -j RETURN
+iptables -t nat -A vpn-mark -d 169.254.0.0/16 -j RETURN
+iptables -t nat -A vpn-mark -d 172.16.0.0/12 -j RETURN
+iptables -t nat -A vpn-mark -d 192.168.0.0/16 -j RETURN
+
+# chnroutes
+iptables -t nat -A vpn-mark -m set --match-set chnnetworks dst -j RETURN
+
+# This connection should go through VPN
+iptables -t nat -A vpn-mark -j CONNMARK --set-mark 0x100
+
+# When VPN is not connected, reject all connections to prevent information leak
+# TODO: Enable it after routing scripts is modified
+# iptables -t filter -A vpn-reject -j REJECT --reject-with icmp-host-unreachable
+
+# Install custom chains
+iptables -t nat -A PREROUTING -j vpn-mark
+iptables -t nat -A OUTPUT -j vpn-mark
+iptables -t nat -A POSTROUTING -m connmark --mark 0x100 -j vpn-action
+iptables -t filter -A FORWARD -m connmark --mark 0x100 -j vpn-reject
+iptables -t filter -A OUTPUT -m connmark --mark 0x100 -j vpn-reject
 
 # nat
 iptables -A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS  --clamp-mss-to-pmtu
