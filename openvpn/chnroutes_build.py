@@ -1,4 +1,8 @@
 #!/usr/bin/env python
+
+# Script originally written by Young Ng (fivesheep @ GitHub)
+# Modified by SAPikachu
+
 from __future__ import print_function
 import re
 import urllib2
@@ -41,13 +45,18 @@ def fetch_ip_data():
          
     return results
 
-def build_route_script():
+def build_route_script(format="ip route add {ip}/{mask} $*", shebang=True):
     ips = fetch_ip_data()
-    print("#!/bin/bash")
-    print("")
+    if isinstance(shebang, str) and shebang.lower() in ("0", "false", "no"):
+        shebang = False
+
+    if shebang:
+        print("#!/bin/bash")
+        print("")
+
     for ip, _, mask in ips:
-        print("ip route add {ip}/{mask} $*".format(ip=ip, mask=mask))
+        print(format.format(ip=ip, mask=mask))
 
 if __name__ == "__main__":
-    build_route_script()
+    build_route_script(*sys.argv[1:])
     
