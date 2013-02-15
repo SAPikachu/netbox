@@ -10,9 +10,7 @@ SERVICE_LOCAL_IP=192.168.1.240
 ip rule list | grep "openvpn" > /dev/null
 if [ "$?" -ne "0" ]; then
     ip addr add $SERVICE_LOCAL_IP/24 brd + dev eth0
-    ip rule add from $SERVICE_LOCAL_IP/32 table openvpn
-    ip rule add from 192.168.1.32/28 table openvpn
-    ip rule add from 172.25.0.0/16 table openvpn
+    ip rule add fwmark 0x100/0x100 table openvpn
 
     ip route add 192.168.1.0/24 proto kernel scope link metric 1 table openvpn
 
@@ -25,47 +23,68 @@ echo 60 > /proc/sys/net/ipv4/tcp_keepalive_time
 echo 30 > /proc/sys/net/ipv4/tcp_keepalive_intvl
 echo 5 > /proc/sys/net/ipv4/tcp_keepalive_probes
 
-sysctl -w net.netfilter.nf_conntrack_acct=1
+sysctl -q -w net.netfilter.nf_conntrack_acct=1
+
+# Turn off reverse path validation
+# Needed for policy routing for local packets
+sysctl -q -w net.ipv4.conf.all.rp_filter=0
+sysctl -q -w net.ipv4.conf.default.rp_filter=0
+sysctl -q -w net.ipv4.conf.eth0.rp_filter=0 >/dev/null 2>/dev/null || true
+sysctl -q -w net.ipv4.conf.tun0.rp_filter=0 >/dev/null 2>/dev/null || true
 
 $PREFIX/reset-iptables.sh
 $PREFIX/../vpnutils/ipset-chn-networks.sh
 
 iptables -t nat -N vpn-mark
+iptables -t mangle -N vpn-mark-local # Must be in mangle table to affect routing
 iptables -t nat -N vpn-action
 iptables -t filter -N vpn-reject
 
-# Only specified sources can go through VPN
 ipset create vpnclients hash:net
 ipset add vpnclients $SERVICE_LOCAL_IP
 ipset add vpnclients 192.168.1.32/28
 ipset add vpnclients 192.168.1.208/28
 ipset add vpnclients 172.25.0.0/16
-iptables -t nat -A vpn-mark -m set ! --match-set vpnclients src -j RETURN
 
-# Local packets shouldn't go through VPN
-iptables -t nat -A vpn-mark -i lo -j RETURN
-iptables -t nat -A vpn-mark -o lo -j RETURN
-iptables -t nat -A vpn-mark -d 10.0.0.0/8 -j RETURN
-iptables -t nat -A vpn-mark -d 169.254.0.0/16 -j RETURN
-iptables -t nat -A vpn-mark -d 172.16.0.0/12 -j RETURN
-iptables -t nat -A vpn-mark -d 192.168.0.0/16 -j RETURN
+function build_mark_chain {
+    # Only check each connection once
+    iptables -t $1 -A $2 -j CONNMARK --restore-mark
+    iptables -t $1 -A $2 -m connmark --mark 0x80/0x80 -j RETURN
+    iptables -t $1 -A $2 -j CONNMARK --set-mark 0x80/0x80 
 
-# chnroutes
-iptables -t nat -A vpn-mark -m set --match-set chnnetworks dst -j RETURN
+    # Only specified sources can go through VPN
+    iptables -t $1 -A $2 -m set ! --match-set vpnclients src -j RETURN
 
-# This connection should go through VPN
-iptables -t nat -A vpn-mark -j CONNMARK --set-mark 0x100
+    # Local packets shouldn't go through VPN
+    iptables -t $1 -A $2 -i lo -j RETURN
+    iptables -t $1 -A $2 -o lo -j RETURN
+    iptables -t $1 -A $2 -d 10.0.0.0/8 -j RETURN
+    iptables -t $1 -A $2 -d 169.254.0.0/16 -j RETURN
+    iptables -t $1 -A $2 -d 172.16.0.0/12 -j RETURN
+    iptables -t $1 -A $2 -d 192.168.0.0/16 -j RETURN
+
+    # chnroutes
+    iptables -t $1 -A $2 -m set --match-set chnnetworks dst -j RETURN
+
+    # This connection should go through VPN
+    iptables -t $1 -A $2 -j CONNMARK --set-mark 0x100/0x100
+    iptables -t $1 -A $2 -j MARK --set-mark 0x100/0x100
+}
+
+build_mark_chain nat vpn-mark
+build_mark_chain mangle vpn-mark-local
 
 # When VPN is not connected, reject all connections to prevent information leak
-# TODO: Enable it after routing scripts is modified
-# iptables -t filter -A vpn-reject -j REJECT --reject-with icmp-host-unreachable
+iptables -t filter -A vpn-reject -j REJECT --reject-with icmp-host-unreachable
 
 # Install custom chains
 iptables -t nat -A PREROUTING -j vpn-mark
-iptables -t nat -A OUTPUT -j vpn-mark
-iptables -t nat -A POSTROUTING -m connmark --mark 0x100 -j vpn-action
-iptables -t filter -A FORWARD -m connmark --mark 0x100 -j vpn-reject
-iptables -t filter -A OUTPUT -m connmark --mark 0x100 -j vpn-reject
+iptables -t mangle -A OUTPUT -j vpn-mark-local
+iptables -t nat -A POSTROUTING -m connmark --mark 0x100/0x100 -j vpn-action
+iptables -t filter -A FORWARD -m connmark --mark 0x100/0x100 -j vpn-reject
+iptables -t filter -A OUTPUT -m connmark --mark 0x100/0x100 -j vpn-reject
+iptables -t mangle -A PREROUTING -j CONNMARK --restore-mark
+iptables -t mangle -A OUTPUT -j CONNMARK --restore-mark
 
 # nat
 iptables -A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS  --clamp-mss-to-pmtu

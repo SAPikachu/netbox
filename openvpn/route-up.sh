@@ -29,6 +29,9 @@ ip route add default via $route_vpn_gateway $table
 
 ip route flush cache
 
+iptables -t nat -F vpn-action
+iptables -t filter -F vpn-reject
+
 initctl emit --no-wait openvpn-route-up GATEWAY_ROUTE="$gateway_route" TABLE="$table"
 
 exit 0
