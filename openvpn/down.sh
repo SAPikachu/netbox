@@ -10,7 +10,6 @@ local_route_params="dev $interface proto kernel scope link src $if_ip"
 
 echo "$local_net / $local_route_params"
 
-initctl stop chnroutes || true
 initctl stop post-openvpn-up || true
 
 set -u

@@ -33,7 +33,10 @@ sysctl -q -w net.ipv4.conf.eth0.rp_filter=0 >/dev/null 2>/dev/null || true
 sysctl -q -w net.ipv4.conf.tun0.rp_filter=0 >/dev/null 2>/dev/null || true
 
 $PREFIX/reset-iptables.sh
-$PREFIX/../vpnutils/ipset-chn-networks.sh
+
+# Create empty set here for referencing in iptables, 
+# fill it at the end of script
+$PREFIX/../vpnutils/ipset-chn-networks.sh --empty-set-only
 
 iptables -t nat -N vpn-mark
 iptables -t mangle -N vpn-mark-local # Must be in mangle table to affect routing
@@ -140,3 +143,4 @@ iptables -A INPUT -j DROP
 
 # iptables -A OUTPUT -m limit --limit 1/second -j LOG --log-level 7 --log-prefix "OUTPUT: "
 
+$PREFIX/../vpnutils/ipset-chn-networks.sh
