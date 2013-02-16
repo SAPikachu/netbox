@@ -14,13 +14,20 @@ initctl stop post-openvpn-up || true
 
 set -u
 
-table="table openvpn"
 iptables -t filter -A vpn-reject -j REJECT --reject-with icmp-host-unreachable
 iptables -t nat -F vpn-action
-ip route flush $table
-ip route add $local_net/24 $local_route_params $table
-ip route add unreachable default $table
 
-ip route flush cache
+if [ "x$script_context" != "xrestart" ]; then
+    # Several environment variables are missing on restart,
+    # So we must keep the route table in that case
+
+    table="table openvpn"
+    ip route flush $table
+    ip route add $local_net/24 $local_route_params $table
+    ip route add unreachable default $table
+
+    ip route flush cache
+
+fi
 
 exit 0

@@ -10,5 +10,5 @@ fi
 
 cd "$base/config"
 
-params="--cd $PWD --config $config_name --tls-timeout 5 --dev tun0 --script-security 2 --route-noexec --up $base/up.sh --up-restart --route-up $base/route-up.sh --down $base/down.sh --management 127.0.0.1 56876 $extra_params"
+params="--cd $PWD --config $config_name --tls-timeout 5 --dev tun0 --script-security 2 --route-noexec --up $base/up.sh --up-restart --down $base/down.sh --management 127.0.0.1 56876 $extra_params"
 
