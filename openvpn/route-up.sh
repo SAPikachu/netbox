@@ -32,6 +32,6 @@ ip route flush cache
 iptables -t nat -F vpn-action
 iptables -t filter -F vpn-reject
 
-initctl emit --no-wait openvpn-route-up GATEWAY_ROUTE="$gateway_route" TABLE="$table"
+initctl emit --no-wait openvpn-route-up GATEWAY_ROUTE="$gateway_route" TABLE="$table" script_type="$script_type" script_context="$script_context"
 
 exit 0
