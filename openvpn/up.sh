@@ -14,7 +14,7 @@ table="table openvpn"
 
 gateway_route=`/etc/sapikachu/vpnutils/gateway-route.sh $remote_1`
 
-if [ "x$script_context" != "xrestart" ]; then
+if [ "x${script_context-init}" != "xrestart" ]; then
     # Several environment variables are missing on restart,
     # So we can't repopulate route table
 
@@ -37,6 +37,6 @@ fi
 iptables -t nat -F vpn-action
 iptables -t filter -F vpn-reject
 
-initctl emit --no-wait openvpn-route-up GATEWAY_ROUTE="$gateway_route" TABLE="$table" script_type="$script_type" script_context="$script_context"
+initctl emit --no-wait openvpn-route-up GATEWAY_ROUTE="$gateway_route" TABLE="$table" script_type="${script_type-init}" script_context="${script_context-init}"
 
 exit 0

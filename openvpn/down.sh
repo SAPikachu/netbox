@@ -17,7 +17,7 @@ set -u
 iptables -t filter -A vpn-reject -j REJECT --reject-with icmp-host-unreachable
 iptables -t nat -F vpn-action
 
-if [ "x$script_context" != "xrestart" ]; then
+if [ "x${script_context-init}" != "xrestart" ]; then
     # Several environment variables are missing on restart,
     # So we must keep the route table in that case
 
