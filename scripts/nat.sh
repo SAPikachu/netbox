@@ -27,8 +27,11 @@ ip link set he-ipv6 up
 ip addr flush dev he-ipv6
 ip addr add  $HE_TUNNEL_CLIENT dev he-ipv6
 ip route replace ::/0 dev he-ipv6
+ip -6 addr flush dev eth0 scope global
+ip -6 addr add $HE_TUNNEL_IF_ADDR dev eth0
 
 echo "1" > /proc/sys/net/ipv4/ip_forward
+echo "1" > /proc/sys/net/ipv6/conf/all/forwarding
 
 echo 60 > /proc/sys/net/ipv4/tcp_keepalive_time
 echo 30 > /proc/sys/net/ipv4/tcp_keepalive_intvl
