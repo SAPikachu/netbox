@@ -4,18 +4,29 @@
 set -u
 
 PREFIX=$(dirname $(readlink -m $0))
-
-SERVICE_LOCAL_IP=192.168.1.240
+. $PREFIX/../conf.sh
 
 ip rule list | grep "openvpn" > /dev/null
 if [ "$?" -ne "0" ]; then
-    ip addr add $SERVICE_LOCAL_IP/24 brd + dev eth0
+    ip addr add $SERVICE_IP/24 brd + dev eth0
     ip rule add fwmark 0x100/0x100 table openvpn
 
     ip route add 192.168.1.0/24 proto kernel scope link metric 1 table openvpn
 
     ip route flush cache
 fi
+
+if [ -z "$(ip tunnel show he-ipv6)" ]; then
+    IPV6_MODE="add"
+else
+    IPV6_MODE="change"
+fi
+
+ip tunnel $IPV6_MODE he-ipv6 mode sit remote $HE_TUNNEL_SERVER_V4 local $GENERAL_IP ttl 255
+ip link set he-ipv6 up
+ip addr flush dev he-ipv6
+ip addr add  $HE_TUNNEL_CLIENT dev he-ipv6
+ip route replace ::/0 dev he-ipv6
 
 echo "1" > /proc/sys/net/ipv4/ip_forward
 
@@ -44,7 +55,7 @@ iptables -t nat -N vpn-action
 iptables -t filter -N vpn-reject
 
 ipset create vpnclients hash:net
-ipset add vpnclients $SERVICE_LOCAL_IP
+ipset add vpnclients $SERVICE_IP
 ipset add vpnclients 192.168.1.32/28
 ipset add vpnclients 192.168.1.208/28
 ipset add vpnclients 172.25.0.0/16
