@@ -69,9 +69,6 @@ function build_mark_chain {
     iptables -t $1 -A $2 -m connmark --mark 0x80/0x80 -j RETURN
     iptables -t $1 -A $2 -j CONNMARK --set-mark 0x80/0x80 
 
-    # Only specified sources can go through VPN
-    iptables -t $1 -A $2 -m set ! --match-set vpnclients src -j RETURN
-
     # Local packets shouldn't go through VPN
     iptables -t $1 -A $2 -i lo -j RETURN
     iptables -t $1 -A $2 -o lo -j RETURN
@@ -82,6 +79,16 @@ function build_mark_chain {
 
     # chnroutes
     iptables -t $1 -A $2 -m set --match-set chnnetworks dst -j RETURN
+
+    if [ "$2" == "vpn-mark-local" ]; then
+        # All DNS queries should go through VPN
+        iptables -t $1 -A $2 -m owner --uid-owner pdnsd -j CONNMARK --set-mark 0x100/0x100 
+        iptables -t $1 -A $2 -m owner --uid-owner pdnsd -j MARK --set-mark 0x100/0x100 
+        iptables -t $1 -A $2 -m owner --uid-owner pdnsd -j RETURN
+    fi
+
+    # Only specified sources can go through VPN
+    iptables -t $1 -A $2 -m set ! --match-set vpnclients src -j RETURN
 
     # This connection should go through VPN
     iptables -t $1 -A $2 -j CONNMARK --set-mark 0x100/0x100
@@ -161,7 +168,8 @@ iptables -A INPUT -j DROP
 # to keep CDNs in China working
 ip6tables -N block-v4-dns
 ip6tables -A OUTPUT -p udp -m udp --dport 53 -j block-v4-dns
-# ip6tables -A FORWARD -p udp -m udp --dport 53 -j block-v4-dns
+ip6tables -I block-v4-dns -i lo -j RETURN
+ip6tables -I block-v4-dns -o lo -j RETURN
 
 # Offset 4 = Payload length 
 # (read u32 from offset 2 and mask out the upper bytes)
@@ -169,6 +177,8 @@ ip6tables -A OUTPUT -p udp -m udp --dport 53 -j block-v4-dns
 # Subtract 4 from it (= 0x24) to read the last 4 bytes
 # 0x001c = AAAA record, 0x0001 = INET
 ip6tables -I block-v4-dns -m u32 --u32 "2 & 0xFFFF @ 0x24 = 0x001c0001" -j RETURN
+# Also handle OPT record (11 bytes) at the end
+ip6tables -I block-v4-dns -m u32 --u32 "2 & 0xFFFF @ 0x19 = 0x001c0001" -j RETURN
 ip6tables -A block-v4-dns -j REJECT --reject-with port-unreach
 
 $PREFIX/../vpnutils/ipset-chn-networks.sh
