@@ -157,4 +157,18 @@ iptables -A INPUT -j DROP
 
 # iptables -A OUTPUT -m limit --limit 1/second -j LOG --log-level 7 --log-prefix "OUTPUT: "
 
+# Only accept AAAA records from ipv6 dns server, use local recursive server
+# to keep CDNs in China working
+ip6tables -N block-v4-dns
+ip6tables -A OUTPUT -p udp -m udp --dport 53 -j block-v4-dns
+# ip6tables -A FORWARD -p udp -m udp --dport 53 -j block-v4-dns
+
+# Offset 4 = Payload length 
+# (read u32 from offset 2 and mask out the upper bytes)
+# IP header + UDP header = 0x28 bytes
+# Subtract 4 from it (= 0x24) to read the last 4 bytes
+# 0x001c = AAAA record, 0x0001 = INET
+ip6tables -I block-v4-dns -m u32 --u32 "2 & 0xFFFF @ 0x24 = 0x001c0001" -j RETURN
+ip6tables -A block-v4-dns -j REJECT --reject-with port-unreach
+
 $PREFIX/../vpnutils/ipset-chn-networks.sh
