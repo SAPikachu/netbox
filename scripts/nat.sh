@@ -170,7 +170,9 @@ ip6tables -A OUTPUT -o lo -j ACCEPT
 # Only accept AAAA records from ipv6 dns server, use local recursive server
 # for other records to keep CDNs in China working
 ip6tables -N block-v4-dns
-ip6tables -A OUTPUT -p udp -m udp --dport 53 -j block-v4-dns
+# NOTE: Only block queries to HE's server, otherwise domains with IPv6-only NS
+#       can't be resolved
+ip6tables -A OUTPUT -p udp -m udp -d 2001:470:20::2 --dport 53 -j block-v4-dns
 
 # Offset 4 = Payload length 
 # (read u32 from offset 2 and mask out the upper bytes)
