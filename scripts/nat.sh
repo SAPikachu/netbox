@@ -127,7 +127,6 @@ iptables -A FORWARD -o tun10 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEP
 iptables -A FORWARD -i eth0 -o eth0 -s 192.168.1.0/24 -j ACCEPT
 iptables -A FORWARD -i eth0 -o eth0 -d 192.168.1.0/24 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 
-# iptables -A FORWARD -m limit --limit 1/second -j LOG --log-level 7 --log-prefix "FORWARD DROP: "
 iptables -A FORWARD -j DROP
 
 # firewall
@@ -158,18 +157,20 @@ iptables -A INPUT -i eth0 -p udp -m addrtype --dst-type BROADCAST -m udp --sport
 # ping from internal network
 iptables -A INPUT -p icmp --icmp-type 8 -s 192.168.1.0/24 -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
 
-# iptables -A INPUT -m limit --limit 1/second -j LOG --log-level 7 --log-prefix "INPUT DROP: "
 iptables -A INPUT -j DROP
 
 
-# iptables -A OUTPUT -m limit --limit 1/second -j LOG --log-level 7 --log-prefix "OUTPUT: "
+
+# IPv6 rules
+
+# Firstly accept all loopback connections
+ip6tables -A INPUT -i lo -j ACCEPT
+ip6tables -A OUTPUT -o lo -j ACCEPT
 
 # Only accept AAAA records from ipv6 dns server, use local recursive server
-# to keep CDNs in China working
+# for other records to keep CDNs in China working
 ip6tables -N block-v4-dns
 ip6tables -A OUTPUT -p udp -m udp --dport 53 -j block-v4-dns
-ip6tables -I block-v4-dns -i lo -j RETURN
-ip6tables -I block-v4-dns -o lo -j RETURN
 
 # Offset 4 = Payload length 
 # (read u32 from offset 2 and mask out the upper bytes)
@@ -181,4 +182,19 @@ ip6tables -I block-v4-dns -m u32 --u32 "2 & 0xFFFF @ 0x24 = 0x001c0001" -j RETUR
 ip6tables -I block-v4-dns -m u32 --u32 "2 & 0xFFFF @ 0x19 = 0x001c0001" -j RETURN
 ip6tables -A block-v4-dns -j REJECT --reject-with port-unreach
 
+# Firewall
+ip6tables -A FORWARD -i eth0 -o he-ipv6 -j ACCEPT
+ip6tables -A FORWARD -i he-ipv6 -o eth0 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+ip6tables -A FORWARD -j DROP
+
+
+ip6tables -A INPUT -i eth0 -j ACCEPT
+ip6tables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+
+ip6tables -A INPUT -j DROP
+
 $PREFIX/../vpnutils/ipset-chn-networks.sh
+
+### For reference
+# To log packets:
+# iptables -A OUTPUT -m limit --limit 1/second -j LOG --log-level 7 --log-prefix "OUTPUT: "
