@@ -1,5 +1,8 @@
 #!/bin/bash
 
+. $base/../conf.sh
+
+$base/update-he.sh
 
 config_name=$(cat "$base/config_name")
 extra_params=
