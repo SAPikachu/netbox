@@ -14,6 +14,7 @@ for template in ^*; do
     if [ -f $TARGET ]; then
         mv $TARGET $TARGET.bak
     fi
+    cp --attributes-only $template $TARGET
     cat $template | {
         linenum=1
         while read line; do
@@ -30,7 +31,6 @@ for template in ^*; do
             let linenum+=1
         done
     }
-    cp --attributes-only $template $TARGET
     chmod --reference=$template $TARGET
     chown --reference=$template $TARGET
 done
