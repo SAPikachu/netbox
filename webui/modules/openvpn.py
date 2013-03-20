@@ -58,13 +58,15 @@ class OpenVPN(Module):
                 f.write(extra_params)
 
         subprocess.call(
-            ["initctl", "stop", "openvpn-d"],
+            ["sudo", "-n", "initctl", "stop", "openvpn-d"],
             close_fds=True,
         )
-        subprocess.check_call(
-            ["initctl", "start", "openvpn-d"],
+        subprocess.check_output(
+            ["sudo", "-n", "initctl", "start", "openvpn-d"],
+            stderr=subprocess.STDOUT,
             close_fds=True,
         )
+
     
     def get_status(self):
         try:
