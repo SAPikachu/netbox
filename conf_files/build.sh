@@ -12,7 +12,7 @@ cd $SELFDIR
 for template in ^*; do
     TARGET=${template//^/\/}
     if [ -f $TARGET ]; then
-        mv $TARGET $TARGET.bak
+        mv $TARGET /tmp/$(basename $TARGET).bak
     fi
     cp --attributes-only $template $TARGET
     cat $template | {
