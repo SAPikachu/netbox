@@ -1,0 +1,2 @@
+webui   ALL = (root) NOPASSWD: /sbin/initctl start openvpn-d, /sbin/initctl stop openvpn-d, /usr/sbin/conntrack -L -f *
+
