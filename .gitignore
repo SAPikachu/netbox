@@ -6,3 +6,4 @@ bind/db.*
 openvpn/config_name
 openvpn/extra_params
 conf.sh
+webui/execwrap/
