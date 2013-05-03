@@ -26,12 +26,13 @@ if [ "x${script_context-init}" != "xrestart" ]; then
     ip route show | grep -v ^default | awk '{ system("ip route add " $0 "$OPENVPN_ROUTE_TABLE") } '
 
     # Also add to the main table, since openvpn uses main table itself
-    ip route add $remote_1/32 $gateway_route
+    # Force IPv4, so that it will be ignored for IPv6 server
+    ip -4 route add $remote_1/32 $gateway_route
 
-    ip route add $remote_1/32 $gateway_route $table
-    ip route add default via $route_vpn_gateway $table
+    ip -4 route add $remote_1/32 $gateway_route $table
+    ip -4 route add default via $route_vpn_gateway $table
 
-    ip route flush cache
+    ip -4 route flush cache
 fi
 
 iptables -t nat -F vpn-action
