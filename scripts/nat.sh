@@ -23,7 +23,7 @@ else
 fi
 
 ip tunnel $IPV6_MODE he-ipv6 mode sit remote $HE_TUNNEL_SERVER_V4 local $GENERAL_IP ttl 255
-ip link set he-ipv6 up
+ip link set he-ipv6 mtu 1472 up
 ip addr flush dev he-ipv6
 ip addr add  $HE_TUNNEL_CLIENT dev he-ipv6
 ip route replace ::/0 dev he-ipv6
