@@ -139,6 +139,7 @@ iptables -A OUTPUT -o lo -p all -j ACCEPT
 iptables -A INPUT -i eth0 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 iptables -A INPUT -i tun0 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 iptables -A INPUT -i ppp0 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+iptables -A INPUT -p icmp -j ACCEPT
 iptables -A INPUT -p tcp --dport ssh -j ACCEPT
 iptables -A INPUT -p tcp -s 192.168.1.0/24 --dport 3128 -j ACCEPT
 iptables -A INPUT -p tcp -s 192.168.1.0/24 --dport 443 -j ACCEPT
@@ -191,6 +192,8 @@ ip6tables -A FORWARD -j DROP
 
 
 ip6tables -A INPUT -i eth0 -j ACCEPT
+ip6tables -A INPUT -p icmp -j ACCEPT
+ip6tables -A INPUT -p icmpv6 -j ACCEPT
 ip6tables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 
 ip6tables -A INPUT -j DROP
