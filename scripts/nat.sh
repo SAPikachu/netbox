@@ -13,6 +13,8 @@ if [ "$?" -ne "0" ]; then
 
     ip route add 192.168.1.0/24 proto kernel scope link metric 1 table openvpn
 
+    ip route change `ip route list | grep default` mtu 1492
+
     ip route flush cache
 fi
 
