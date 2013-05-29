@@ -1,0 +1,12 @@
+/var/cache/pdnsd/pdnsd.debug {
+	daily
+	compress
+	delaycompress
+	rotate 2
+	missingok
+	nocreate
+	sharedscripts
+	postrotate
+		service pdnsd restart
+	endscript
+}
