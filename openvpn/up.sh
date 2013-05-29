@@ -10,6 +10,13 @@ done
 
 set -u
 
+# Turn off reverse path validation
+# Needed for policy routing for local packets
+sysctl -q -w net.ipv4.conf.all.rp_filter=0
+sysctl -q -w net.ipv4.conf.default.rp_filter=0
+sysctl -q -w net.ipv4.conf.eth0.rp_filter=0
+sysctl -q -w net.ipv4.conf.tun0.rp_filter=0
+
 table="table openvpn"
 
 gateway_route=`/etc/sapikachu/vpnutils/gateway-route.sh $remote_1`

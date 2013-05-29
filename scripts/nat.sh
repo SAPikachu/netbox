@@ -41,13 +41,6 @@ echo 5 > /proc/sys/net/ipv4/tcp_keepalive_probes
 
 sysctl -q -w net.netfilter.nf_conntrack_acct=1
 
-# Turn off reverse path validation
-# Needed for policy routing for local packets
-sysctl -q -w net.ipv4.conf.all.rp_filter=0
-sysctl -q -w net.ipv4.conf.default.rp_filter=0
-sysctl -q -w net.ipv4.conf.eth0.rp_filter=0 >/dev/null 2>/dev/null || true
-sysctl -q -w net.ipv4.conf.tun0.rp_filter=0 >/dev/null 2>/dev/null || true
-
 $PREFIX/reset-iptables.sh
 
 # Create empty set here for referencing in iptables, 
