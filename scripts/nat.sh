@@ -113,9 +113,11 @@ iptables -t nat -A POSTROUTING -o tun0 -j MASQUERADE
 iptables -t nat -A POSTROUTING -o ppp0 -j MASQUERADE
 
 iptables -A FORWARD -i eth0 -o tun0 -j ACCEPT
+iptables -A FORWARD -i eth0 -o tun2+ -j ACCEPT
 iptables -A FORWARD -i eth0 -o ppp0 -j ACCEPT
 iptables -A FORWARD -i tun10 -j ACCEPT
 iptables -A FORWARD -i tun0 -o eth0 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+iptables -A FORWARD -i tun2+ -o eth0 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 iptables -A FORWARD -i ppp0 -o eth0 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 iptables -A FORWARD -o tun10 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 
