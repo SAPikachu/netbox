@@ -1,3 +1,4 @@
+// @@@-COPY-ONLY
 // Automatically upgrade packages from these (origin:archive) pairs
 Unattended-Upgrade::Allowed-Origins {
 	"${distro_id}:${distro_codename}-security";
