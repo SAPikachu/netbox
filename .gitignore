@@ -7,3 +7,4 @@ openvpn/config_name
 openvpn/extra_params
 conf.sh
 webui/execwrap/
+openvpn-maou/*.conf

@@ -111,18 +111,20 @@ iptables -t nat -A POSTROUTING -o eth0 -s 192.168.1.0/24 -j MASQUERADE
 iptables -t nat -A POSTROUTING -s 172.25.0.0/16 -j MASQUERADE
 iptables -t nat -A POSTROUTING -o tun0 -j MASQUERADE
 iptables -t nat -A POSTROUTING -o ppp0 -j MASQUERADE
+iptables -t nat -N dynamic-masquerade
+iptables -t nat -A POSTROUTING -j dynamic-masquerade
 
 iptables -A FORWARD -i eth0 -o tun0 -j ACCEPT
-iptables -A FORWARD -i eth0 -o tun2+ -j ACCEPT
 iptables -A FORWARD -i eth0 -o ppp0 -j ACCEPT
 iptables -A FORWARD -i tun10 -j ACCEPT
 iptables -A FORWARD -i tun0 -o eth0 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
-iptables -A FORWARD -i tun2+ -o eth0 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 iptables -A FORWARD -i ppp0 -o eth0 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 iptables -A FORWARD -o tun10 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 
 iptables -A FORWARD -i eth0 -o eth0 -s 192.168.1.0/24 -j ACCEPT
 iptables -A FORWARD -i eth0 -o eth0 -d 192.168.1.0/24 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+iptables -N dynamic-forward
+iptables -A FORWARD -j dynamic-forward
 
 iptables -A FORWARD -j DROP
 
@@ -154,6 +156,8 @@ iptables -A INPUT -i eth0 -p udp -m addrtype --dst-type BROADCAST -m udp --sport
 
 # ping from internal network
 iptables -A INPUT -p icmp --icmp-type 8 -s 192.168.1.0/24 -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
+iptables -N dynamic-input
+iptables -A INPUT -j dynamic-input
 
 iptables -A INPUT -j DROP
 

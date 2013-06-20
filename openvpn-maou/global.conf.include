@@ -1,0 +1,19 @@
+client
+proto udp6
+nobind
+keepalive 5 15
+cipher AES-256-CBC
+ns-cert-type server
+comp-lzo
+persist-key
+persist-tun
+verb 3
+mute 20
+mute-replay-warnings
+fragment 1400
+mssfix 1400
+script-security 2
+route-noexec
+up up.sh
+down down.sh
+
