@@ -8,3 +8,5 @@ openvpn/extra_params
 conf.sh
 webui/execwrap/
 openvpn-maou/*.conf
+disable-aufs
+discard-aufs
