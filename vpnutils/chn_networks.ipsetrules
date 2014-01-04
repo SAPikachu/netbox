@@ -567,6 +567,7 @@ add chnnetworks 203.21.34.0/24
 add chnnetworks 59.62.0.0/15
 add chnnetworks 210.74.0.0/19
 add chnnetworks 103.20.128.0/22
+add chnnetworks 103.255.184.0/22
 add chnnetworks 202.122.32.0/21
 add chnnetworks 203.31.105.0/24
 add chnnetworks 183.91.144.0/20
@@ -3241,7 +3242,6 @@ add chnnetworks 103.22.40.0/22
 add chnnetworks 103.248.152.0/22
 add chnnetworks 202.143.32.0/20
 add chnnetworks 103.247.176.0/22
-add chnnetworks 103.244.148.0/22
 add chnnetworks 203.56.214.0/24
 add chnnetworks 120.134.0.0/15
 add chnnetworks 223.192.0.0/15
