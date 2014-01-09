@@ -548,6 +548,7 @@ add chnnetworks 202.75.208.0/20
 add chnnetworks 203.100.192.0/20
 add chnnetworks 58.32.0.0/13
 add chnnetworks 103.3.84.0/22
+add chnnetworks 103.255.200.0/22
 add chnnetworks 42.96.108.0/22
 add chnnetworks 119.58.0.0/16
 add chnnetworks 1.50.0.0/16
@@ -1325,6 +1326,7 @@ add chnnetworks 220.242.0.0/15
 add chnnetworks 113.208.96.0/19
 add chnnetworks 202.20.87.0/24
 add chnnetworks 203.145.0.0/19
+add chnnetworks 103.255.228.0/22
 add chnnetworks 42.62.180.0/22
 add chnnetworks 218.104.0.0/17
 add chnnetworks 203.90.0.0/22
@@ -2434,6 +2436,7 @@ add chnnetworks 223.160.0.0/14
 add chnnetworks 202.4.252.0/22
 add chnnetworks 202.21.132.0/24
 add chnnetworks 61.136.64.0/18
+add chnnetworks 103.255.208.0/22
 add chnnetworks 223.223.192.0/20
 add chnnetworks 202.166.224.0/19
 add chnnetworks 103.25.156.0/22
@@ -3464,6 +3467,7 @@ add chnnetworks 202.119.96.0/19
 add chnnetworks 203.29.13.0/24
 add chnnetworks 221.196.0.0/15
 add chnnetworks 203.57.253.0/24
+add chnnetworks 103.255.212.0/22
 add chnnetworks 203.207.128.0/17
 add chnnetworks 1.1.2.0/23
 add chnnetworks 110.88.0.0/14
